@@ -1,0 +1,149 @@
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/pirate_tv?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      # 初始化时建立物理连接的个数
+      initial-size: 20
+      # 连接池的最小空闲数量
+      min-idle: 5
+      # 连接池最大连接数量
+      max-active: 50
+      # 获取连接时最大等待时间，单位毫秒
+      max-wait: 60000
+      # 申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。
+      test-while-idle: true
+      # 既作为检测的间隔时间又作为testWhileIdel执行的依据
+      time-between-eviction-runs-millis: 60000
+      # 销毁线程时检测当前连接的最后活动时间和当前时间差大于该值时，关闭当前连接(配置连接在池中的最小生存时间)
+      min-evictable-idle-time-millis: 30000
+      # 用来检测数据库连接是否有效的sql 必须是一个查询语句(oracle中为 select 1 from dual)
+      validation-query: select 'x'
+      # 申请连接时会执行validationQuery检测连接是否有效,开启会降低性能,默认为true
+      test-on-borrow: false
+      # 归还连接时会执行validationQuery检测连接是否有效,开启会降低性能,默认为true
+      test-on-return: false
+      # 是否缓存preparedStatement, 也就是PSCache,PSCache对支持游标的数据库性能提升巨大，比如说oracle,在mysql下建议关闭。
+      pool-prepared-statements: false
+      # 置监控统计拦截的filters，去掉后监控界面sql无法统计，stat: 监控统计、Slf4j:日志记录、waLL: 防御sqL注入
+      filters: stat,wall,slf4j
+      # 要启用PSCache，必须配置大于0，当大于0时，poolPreparedStatements自动触发修改为true。在Druid中，不会存在Oracle下PSCache占用内存过多的问题，可以把这个数值配置大一些，比如说100
+      max-pool-prepared-statement-per-connection-size: -1
+      # 合并多个DruidDataSource的监控数据
+      use-global-data-source-stat: true
+
+      stat-view-servlet:
+        enabled: true
+        login-username: admin
+        login-password: 123456
+      web-stat-filter:
+        enabled: true
+        url-pattern: /druid/*
+        exclusions: /druid/*,*.js,*.gif,*.jpg,*.png,*.css,*.ico
+  jdbc:
+    template:
+      query-timeout: 1
+
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    password:
+    jedis:
+      pool:
+        max-active: 200
+        max-idle: 10
+        min-idle: 5
+        max-wait: -1
+    timeout: 6000
+
+#rocketmq配置信息
+rocketmq:
+  #nameservice服务器地址（多个以英文逗号隔开）
+  name-server: 127.0.0.1:9876
+  #生产者配置
+  producer:
+    isOnOff: on
+    # 发送同一类消息设置为同一个group，保证唯一默认不需要设置，rocketmq会使用ip@pid（pid代表jvm名字）作为唯一标识
+    groupName: ${spring.application.name}
+    # 消息最大长度 默认 1024 * 4 (4M)
+    maxMessageSize: 4096
+    # 发送消息失败重试次数，默认2
+    retryTimesWhenSendFailed: 2
+    # 发送消息超时时间，默认 3000
+    sendMsgTimeOut: 3000
+    #组名
+    group: ${spring.application.name}
+    #topic
+    topic: spring-topic
+    #sync tag(同步消息tag)
+    sync-tag: spring-sync-tags
+    #async tag(异步消息tag)
+    async-tag: spring-async-tags
+    #oneway tag(单向消息tag)
+    oneway-tag: spring-oneway-tags
+
+  # 消费者
+  consumer:
+    isOnOff: on
+    group: ${spring.application.name}
+    # 消费者线程数据量
+    consumeThreadMin: 2
+    consumeThreadMax: 16
+
+## Nacos registry address
+dubbo:
+  application: #当前这个应用的信息
+    name: ${spring.application.name} #应用名
+    # 禁用QOS同一台机器可能会有端口冲突现象
+    qos-enable: false
+    qos-accept-foreign-ip: false
+    register-mode: instance
+  protocol: # 服务采用的协议 基本默认未dubbo协议(netty)
+    name: dubbo
+    port: -1 #dubbo服务暴露的端口
+  registry: #注册相关信息
+    #address: zookeeper://10.250.204.106:2181 #注册中心配置
+    address: nacos://localhost:8848 #注册中心配置
+    timeout: 30000 # 到注册中心的超时时间
+    # 配置 namespace
+    #parameters:
+      #namespace: 2077e067-9cd7-4ca5-95de-b3907fd19ed2
+      # 服务分组
+    #group: dev
+  provider:
+    retries: -1 #重试次数 consumer
+    delay: -1 #延迟到spring容器加载之后
+  scan: #需要发布的服务接口实现类扫描路径
+    base-packages: com.mltt.service.impl
+  consumer:
+    timeout: 50000 # 访问服务超时时间
+    check: false
+
+nacos:
+  config:  # 这里的优先级高于扩展配置ext-config:
+    bootstrap:
+      enable: true #开启配置预加载功能
+      log-enable: false
+    server-addr: 127.0.0.1:8848 # 主配置服务器地址
+    group: ${spring.profiles.active} # 主配置 group-id  这里约定环境参数
+    namespace: 2077e067-9cd7-4ca5-95de-b3907fd19ed2 # 主配置
+    data-id: spring-boot-api-dev.yml  # 主配置 data-id
+    type: yaml # 主配置 配置文件类型
+    remote-first: true  # true 代表nacos配置中心的配置优先级高 否则本地配置优先级高 默认false
+    max-retry: 2 # 主配置 最大重试次数
+    auto-refresh: true # 主配置 开启自动刷新
+    config-retry-time: 3000  # 主配置 重试时间
+    config-long-poll-timeout: 6000   # 主配置 配置监听长轮询超时时间
+    enable-remote-sync-config: false  # 主配置 开启注册监听器预加载配置服务（除非特殊业务需求，否则不推荐打开该参数）
+    username: nacos
+    password: nacos
+
+logging:
+  file:
+    path: ./logs
+  level:
+    root: INFO
