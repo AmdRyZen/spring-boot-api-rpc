@@ -6,7 +6,9 @@ import com.mltt.biz.vo.FUserVo;
 import com.mltt.exception.ServiceException;
 import com.mltt.mapper.FUserMapper;
 import com.mltt.service.ApiService;
+import com.mltt.service.DubboApiService;
 import com.mltt.utils.StringUtils;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@DubboService(version = "1.0", group = "dubboApi", interfaceClass = ApiService.class)
 public class ApiServiceImpl extends ServiceImpl<FUserMapper, FUser> implements ApiService {
     @Resource
     FUserMapper fUserMapper;
