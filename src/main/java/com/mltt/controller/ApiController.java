@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/bootrpc/api")
 public class ApiController {
     @Resource
     ApiService apiService;
