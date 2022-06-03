@@ -34,7 +34,6 @@ spring:
       max-pool-prepared-statement-per-connection-size: -1
       # 合并多个DruidDataSource的监控数据
       use-global-data-source-stat: true
-
       stat-view-servlet:
         enabled: true
         login-username: admin
@@ -46,7 +45,6 @@ spring:
   jdbc:
     template:
       query-timeout: 1
-
   redis:
     database: 0
     host: 127.0.0.1
@@ -59,6 +57,10 @@ spring:
         min-idle: 5
         max-wait: -1
     timeout: 6000
+  cloud:
+    nacos:
+      discovery:
+        group: SPRING_CLOUD
 
 #rocketmq配置信息
 rocketmq:
