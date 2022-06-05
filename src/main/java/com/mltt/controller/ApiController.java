@@ -2,11 +2,15 @@ package com.mltt.controller;
 
 import com.alibaba.nacos.api.config.annotation.NacosValue;
 import com.mltt.biz.model.FUser;
+import com.mltt.exception.ServiceException;
 import com.mltt.service.ApiService;
 import com.mltt.service.DubboApiService;
+import com.mltt.utils.ApiResultUtils;
 import org.apache.dubbo.common.stream.StreamObserver;
 import org.apache.dubbo.config.annotation.DubboReference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +20,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/api")
 public class ApiController {
+    private static final Logger log = LoggerFactory.getLogger(ApiController.class);
     @Resource
     ApiService apiService;
     @Resource
@@ -32,8 +37,9 @@ public class ApiController {
     public DubboApiService dubboRpcService;
 
     @RequestMapping("/dubbo")
-    public FUser dubbo() {
-        return dubboRpcService.getFuserList();
+    public ApiResultUtils<FUser> dubbo() throws ServiceException {
+        log.info("dubbo");
+        return ApiResultUtils.success(dubboRpcService.getFuserList());
     }
 
     @RequestMapping("/serverStream")
