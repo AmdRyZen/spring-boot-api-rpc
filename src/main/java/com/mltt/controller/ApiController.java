@@ -38,7 +38,7 @@ public class ApiController {
     public FeignApiService feignApiService;
 
     @RequestMapping("/feign")
-    public ApiResultUtils<String> feign() throws ServiceException {
+    public ApiResultUtils<FUser> feign() throws ServiceException {
         log.info("boot-api-rpc-feign");
         return ApiResultUtils.success(feignApiService.getFuserList());
     }
