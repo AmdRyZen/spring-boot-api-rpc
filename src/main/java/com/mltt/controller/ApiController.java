@@ -5,6 +5,7 @@ import com.mltt.biz.model.FUser;
 import com.mltt.exception.ServiceException;
 import com.mltt.service.ApiService;
 import com.mltt.service.DubboApiService;
+import com.mltt.service.FeignApiService;
 import com.mltt.utils.ApiResultUtils;
 import org.apache.dubbo.common.stream.StreamObserver;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -21,10 +23,6 @@ import javax.annotation.Resource;
 @RequestMapping("/api")
 public class ApiController {
     private static final Logger log = LoggerFactory.getLogger(ApiController.class);
-    @Resource
-    ApiService apiService;
-    @Resource
-    JdbcTemplate jdbcTemplate;
     @NacosValue(value = "${username.aa:none}", autoRefreshed = true)
     private String username;
 
@@ -35,6 +33,15 @@ public class ApiController {
 
     @DubboReference(version = "1.0", group = "dubboApi", interfaceClass = DubboApiService.class)
     public DubboApiService dubboRpcService;
+
+    @Resource
+    public FeignApiService feignApiService;
+
+    @RequestMapping("/feign")
+    public ApiResultUtils<String> feign() throws ServiceException {
+        log.info("boot-api-rpc-feign");
+        return ApiResultUtils.success(feignApiService.getFuserList());
+    }
 
     @RequestMapping("/dubbo")
     public ApiResultUtils<FUser> dubbo() throws ServiceException {
