@@ -1,6 +1,9 @@
 package com.mltt.controller;
 
+import brave.Tracer;
 import com.alibaba.nacos.api.config.annotation.NacosValue;
+import com.mltt.biz.dto.BaseDto;
+import com.mltt.biz.dto.DubboDto;
 import com.mltt.biz.model.FUser;
 import com.mltt.exception.ServiceException;
 import com.mltt.service.ApiService;
@@ -35,6 +38,9 @@ public class ApiController {
     public DubboApiService dubboRpcService;
 
     @Resource
+    private Tracer trace;
+
+    @Resource
     public FeignApiService feignApiService;
 
     @RequestMapping("/feign")
@@ -46,7 +52,11 @@ public class ApiController {
     @RequestMapping("/dubbo")
     public ApiResultUtils<FUser> dubbo() throws ServiceException {
         log.info("dubbo");
-        return ApiResultUtils.success(dubboRpcService.getFuserList());
+        DubboDto dto = new DubboDto();
+        dto.setTraceId(trace.currentSpan().context().traceIdString());
+        dto.setId(111);
+        System.out.println("dto.toString() = " + dto.getTraceId());
+        return ApiResultUtils.success(dubboRpcService.getFuserList(dto));
     }
 
     @RequestMapping("/serverStream")
