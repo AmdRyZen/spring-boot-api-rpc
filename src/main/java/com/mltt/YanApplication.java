@@ -11,7 +11,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @MapperScan("com.mltt.mapper")
 @EnableDubbo
-@NacosConfigurationProperties(dataId = "spring-boot-api-dev.yml", autoRefreshed = true)
+@NacosConfigurationProperties(dataId = "spring-boot-api-native.yml", autoRefreshed = true)
 @EnableDiscoveryClient
 @EnableFeignClients
 @EnableCaching
